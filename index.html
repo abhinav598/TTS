@@ -61,14 +61,61 @@
     color: #3F6B4F;
     cursor: default;
   }
+  #token-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  #gh-token-input {
+    flex: 1;
+    min-width: 0;
+    font-family: monospace;
+    background: #FFFBF2;
+    color: #211D17;
+    border: 2px solid #211D17;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+  }
+  #save-token-btn {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    background: #EA6A3C;
+    color: #FFFBF2;
+    border: 2px solid #211D17;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
   <div id="root"><div id="boot-loading">Loading your timetable…</div></div>
 
   <div id="bg-notif-bar">
+    <div id="token-row">
+      <input id="gh-token-input" type="password" placeholder="Paste your GitHub token" />
+      <button id="save-token-btn">Save GitHub token</button>
+    </div>
     <button id="bg-notif-btn">Enable background notifications (works when app is closed)</button>
   </div>
+
+  <script>
+    // Your GitHub token is saved ONLY in this browser's local storage —
+    // it's never written to any file, never committed, never sent
+    // anywhere except directly to api.github.com when syncing your data.
+    document.getElementById("save-token-btn").addEventListener("click", () => {
+      const val = document.getElementById("gh-token-input").value.trim();
+      if (!val) return;
+      window.localStorage.setItem("tt-github-token", val);
+      document.getElementById("gh-token-input").value = "";
+      document.getElementById("save-token-btn").textContent = "Token saved ✓";
+    });
+    if (window.localStorage.getItem("tt-github-token")) {
+      document.getElementById("save-token-btn").textContent = "Token saved ✓";
+    }
+  </script>
 
   <script src="./config.js"></script>
   <script src="./github-sync.js"></script>
