@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#EA6A3C" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Timetable" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<link rel="icon" href="./icon-192.png" />
+<title>V(A) Timetable</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2/dist/tabler-icons.min.css" />
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #F2E6D2;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  #root {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 12px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    box-sizing: border-box;
+  }
+  button, input, select {
+    font-size: 14px;
+  }
+  #boot-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    font-family: sans-serif;
+    color: #6E6151;
+  }
+  #bg-notif-bar {
+    max-width: 480px;
+    margin: 0 auto 12px auto;
+    padding: 0 12px calc(12px + env(safe-area-inset-bottom)) 12px;
+    box-sizing: border-box;
+  }
+  #bg-notif-btn {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    background: #FFFBF2;
+    color: #211D17;
+    border: 2px solid #211D17;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+  }
+  #bg-notif-btn:disabled {
+    background: #DDE7DC;
+    color: #3F6B4F;
+    cursor: default;
+  }
+</style>
+</head>
+<body>
+  <div id="root"><div id="boot-loading">Loading your timetable…</div></div>
+
+  <div id="bg-notif-bar">
+    <button id="bg-notif-btn">Enable background notifications (works when app is closed)</button>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./github-sync.js"></script>
+  <script src="./storage-shim.js"></script>
+  <script src="./push-subscribe.js"></script>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel" data-presets="react" src="./app-component.jsx"></script>
+
+  <script type="text/babel" data-presets="react">
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<TimetableApp />);
+  </script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch((err) => {
+          console.error("Service worker registration failed:", err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
