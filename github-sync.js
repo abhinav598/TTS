@@ -9,8 +9,9 @@
   }
 
   function authHeaders() {
+    const token = window.localStorage.getItem("tt-github-token");
     return {
-      Authorization: `Bearer ${window.APP_CONFIG.githubToken}`,
+      Authorization: `Bearer ${token}`,
       Accept: "application/vnd.github+json",
     };
   }
@@ -29,9 +30,10 @@
   }
 
   async function writeFile(name, dataObj, message) {
-    const { githubOwner, githubRepo, githubToken } = window.APP_CONFIG;
-    if (!githubOwner || !githubRepo || !githubToken) {
-      console.warn("GitHub sync skipped: config.js is not filled in yet.");
+    const { githubOwner, githubRepo } = window.APP_CONFIG;
+    const token = window.localStorage.getItem("tt-github-token");
+    if (!githubOwner || !githubRepo || !token) {
+      console.warn("GitHub sync skipped: config.js or your token isn't set up yet.");
       return;
     }
     const { sha } = await readFile(name);
