@@ -1,0 +1,51 @@
+name: Send timetable notifications
+
+on:
+  schedule:
+    # 19:00 IST daily = 13:30 UTC — lab-record reminder
+    - cron: "30 13 * * *"
+    # 09:00 IST daily = 03:30 UTC — submission (2-days/1-day-prior) reminder
+    - cron: "30 3 * * *"
+  workflow_dispatch: {} # lets you trigger a run manually to test
+
+permissions:
+  contents: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm install
+
+      - name: Determine which check fired
+        id: which
+        run: |
+          if [ "${{ github.event.schedule }}" = "30 13 * * *" ]; then
+            echo "trigger=lab-check" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "30 3 * * *" ]; then
+            echo "trigger=submission-check" >> "$GITHUB_OUTPUT"
+          else
+            echo "trigger=lab-check" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run notification check
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: "mailto:example@example.com"
+          TRIGGER: ${{ steps.which.outputs.trigger }}
+        run: node scripts/notify.js
+
+      - name: Commit updated sent-log
+        run: |
+          git config user.name "timetable-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/sent-log.json
+          git diff --cached --quiet || git commit -m "Update sent-log [skip ci]"
+          git push
