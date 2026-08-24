@@ -117,6 +117,38 @@
     }
   </script>
 
+  <script>
+    // Shows any real error directly on screen, since phones don't have
+    // easy access to a browser console. Temporary — for debugging only.
+    window.addEventListener("error", (e) => {
+      const el = document.getElementById("boot-loading");
+      if (el) {
+        el.style.color = "#B23A2E";
+        el.style.textAlign = "left";
+        el.style.padding = "16px";
+        el.style.whiteSpace = "pre-wrap";
+        el.style.fontFamily = "monospace";
+        el.style.fontSize = "12px";
+        el.textContent =
+          "ERROR: " + (e.message || "unknown") +
+          "\nFile: " + (e.filename || "?") +
+          "\nLine: " + (e.lineno || "?") + ":" + (e.colno || "?");
+      }
+    });
+    window.addEventListener("unhandledrejection", (e) => {
+      const el = document.getElementById("boot-loading");
+      if (el) {
+        el.style.color = "#B23A2E";
+        el.style.textAlign = "left";
+        el.style.padding = "16px";
+        el.style.whiteSpace = "pre-wrap";
+        el.style.fontFamily = "monospace";
+        el.style.fontSize = "12px";
+        el.textContent = "PROMISE ERROR: " + (e.reason && e.reason.message ? e.reason.message : String(e.reason));
+      }
+    });
+  </script>
+
   <script src="./config.js"></script>
   <script src="./github-sync.js"></script>
   <script src="./storage-shim.js"></script>
@@ -129,8 +161,21 @@
   <script type="text/babel" data-presets="react" src="./app-component.jsx"></script>
 
   <script type="text/babel" data-presets="react">
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<TimetableApp />);
+    try {
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<TimetableApp />);
+    } catch (err) {
+      const el = document.getElementById("boot-loading");
+      if (el) {
+        el.style.color = "#B23A2E";
+        el.style.textAlign = "left";
+        el.style.padding = "16px";
+        el.style.whiteSpace = "pre-wrap";
+        el.style.fontFamily = "monospace";
+        el.style.fontSize = "12px";
+        el.textContent = "RENDER ERROR: " + err.message + "\n\n" + err.stack;
+      }
+    }
   </script>
 
   <script>
