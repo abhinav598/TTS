@@ -15,8 +15,8 @@
       alert("This browser doesn't support background push notifications.");
       return;
     }
-    if (!window.APP_CONFIG.githubOwner || !window.APP_CONFIG.githubToken) {
-      alert("config.js isn't filled in yet — see the README for setup steps first.");
+    if (!window.APP_CONFIG.githubOwner || !window.localStorage.getItem("tt-github-token")) {
+      alert("Set up your GitHub token first (tap 'Save GitHub token' below) and fill in config.js — see the README.");
       return;
     }
 
