@@ -102,24 +102,8 @@
   </div>
 
   <script>
-    // Your GitHub token is saved ONLY in this browser's local storage —
-    // it's never written to any file, never committed, never sent
-    // anywhere except directly to api.github.com when syncing your data.
-    document.getElementById("save-token-btn").addEventListener("click", () => {
-      const val = document.getElementById("gh-token-input").value.trim();
-      if (!val) return;
-      window.localStorage.setItem("tt-github-token", val);
-      document.getElementById("gh-token-input").value = "";
-      document.getElementById("save-token-btn").textContent = "Token saved ✓";
-    });
-    if (window.localStorage.getItem("tt-github-token")) {
-      document.getElementById("save-token-btn").textContent = "Token saved ✓";
-    }
-  </script>
-
-  <script>
     // Shows any real error directly on screen, since phones don't have
-    // easy access to a browser console. Temporary — for debugging only.
+    // easy access to a browser console.
     window.addEventListener("error", (e) => {
       const el = document.getElementById("boot-loading");
       if (el) {
@@ -135,48 +119,31 @@
           "\nLine: " + (e.lineno || "?") + ":" + (e.colno || "?");
       }
     });
-    window.addEventListener("unhandledrejection", (e) => {
-      const el = document.getElementById("boot-loading");
-      if (el) {
-        el.style.color = "#B23A2E";
-        el.style.textAlign = "left";
-        el.style.padding = "16px";
-        el.style.whiteSpace = "pre-wrap";
-        el.style.fontFamily = "monospace";
-        el.style.fontSize = "12px";
-        el.textContent = "PROMISE ERROR: " + (e.reason && e.reason.message ? e.reason.message : String(e.reason));
-      }
-    });
   </script>
 
-  <script src="./config.js?v=1787599780"></script>
-  <script src="./github-sync.js?v=1787599780"></script>
-  <script src="./storage-shim.js?v=1787599780"></script>
-  <script src="./push-subscribe.js?v=1787599780"></script>
+  <script>
+    document.getElementById("save-token-btn").addEventListener("click", () => {
+      const val = document.getElementById("gh-token-input").value.trim();
+      if (!val) return;
+      window.localStorage.setItem("tt-github-token", val);
+      document.getElementById("gh-token-input").value = "";
+      document.getElementById("save-token-btn").textContent = "Token saved ✓";
+    });
+    if (window.localStorage.getItem("tt-github-token")) {
+      document.getElementById("save-token-btn").textContent = "Token saved ✓";
+    }
+  </script>
+
+  <script src="./config.js"></script>
+  <script src="./github-sync.js"></script>
+  <script src="./storage-shim.js"></script>
+  <script src="./push-subscribe.js"></script>
 
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script type="text/babel" data-presets="react" src="./app-component.jsx?v=1787599780"></script>
-
-  <script type="text/babel" data-presets="react">
-    try {
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<TimetableApp />);
-    } catch (err) {
-      const el = document.getElementById("boot-loading");
-      if (el) {
-        el.style.color = "#B23A2E";
-        el.style.textAlign = "left";
-        el.style.padding = "16px";
-        el.style.whiteSpace = "pre-wrap";
-        el.style.fontFamily = "monospace";
-        el.style.fontSize = "12px";
-        el.textContent = "RENDER ERROR: " + err.message + "\n\n" + err.stack;
-      }
-    }
-  </script>
+  <script src="./app-component.js"></script>
+  <script src="./render.js"></script>
 
   <script>
     if ("serviceWorker" in navigator) {
