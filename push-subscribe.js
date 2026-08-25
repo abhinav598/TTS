@@ -11,38 +11,44 @@
   }
 
   async function enableBackgroundNotifications() {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      alert("This browser doesn't support background push notifications.");
-      return;
-    }
-    if (!window.APP_CONFIG.githubOwner || !window.localStorage.getItem("tt-github-token")) {
-      alert("Set up your GitHub token first (tap 'Save GitHub token' below) and fill in config.js — see the README.");
-      return;
-    }
+    try {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        alert("This browser doesn't support background push notifications.");
+        return;
+      }
+      if (!window.APP_CONFIG.githubOwner || !window.localStorage.getItem("tt-github-token")) {
+        alert("Set up your GitHub token first (tap 'Save GitHub token' below) and fill in config.js — see the README.");
+        return;
+      }
 
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      alert("Notifications permission was not granted.");
-      return;
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        alert("Notifications permission was not granted. Current status: " + permission);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(window.APP_CONFIG.vapidPublicKey),
+        });
+      }
+
+      await window.githubSync.writeFile(
+        "subscription.json",
+        subscription.toJSON(),
+        "Update push subscription"
+      );
+
+      alert("Success! Your subscription synced to GitHub.");
+      document.getElementById("bg-notif-btn").textContent = "Background notifications: ON";
+      document.getElementById("bg-notif-btn").disabled = true;
+    } catch (err) {
+      alert("FAILED: " + err.message);
+      console.error(err);
     }
-
-    const registration = await navigator.serviceWorker.ready;
-    let subscription = await registration.pushManager.getSubscription();
-    if (!subscription) {
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(window.APP_CONFIG.vapidPublicKey),
-      });
-    }
-
-    await window.githubSync.writeFile(
-      "subscription.json",
-      subscription.toJSON(),
-      "Update push subscription"
-    );
-
-    document.getElementById("bg-notif-btn").textContent = "Background notifications: ON";
-    document.getElementById("bg-notif-btn").disabled = true;
   }
 
   window.addEventListener("DOMContentLoaded", () => {
